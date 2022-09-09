@@ -15,6 +15,31 @@ package gsa
 //      The two rows in the pairwise alignment
 func Align(p, q, edits string) (pRow, qRow string) {
 	pRow, qRow = "", ""
+	pItr, qItr := 0, 0
+	for pos, char := range edits {
+		char := string(char)
+
+		pEnd := pItr + 1
+		qEnd := qItr + 1
+		if char == "M" {
+			pRow += p[pItr:pEnd]
+			qRow += q[qItr:qEnd]
+			pItr += 1
+			qItr += 1
+		}
+
+		if char == "I" {
+			pRow += "-"
+			qRow += q[qItr:qEnd]
+			qItr += 1
+		}
+
+		if char == "D" {
+			pRow += p[pos:pEnd]
+			qRow += "-"
+			pItr += 1
+		}
+	}
 	// Align p and q based on edits
 	return pRow, qRow
 }
@@ -29,8 +54,10 @@ func Align(p, q, edits string) (pRow, qRow string) {
 //
 //  Returns:
 //      The two rows in the pairwise alignment
+
 func LocalAlign(p, x string, i int, edits string) (pRow, xRow string) {
 	pRow, xRow = "", ""
 	// Align p and q based on edits
+	pRow, xRow = Align(p, x[i:], edits)
 	return pRow, xRow
 }
