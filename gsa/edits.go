@@ -97,18 +97,14 @@ func Align_help(p, q, edits string) (pRow, qRow string) {
 	return pRow, qRow
 }
 func EditDist(p, x string, i int, edits string) int {
+
+	// IDK I CANT IMPORT LocalAlign AAAAAH
 	pRow, xRow := LocalAlign_helper(p, x, i, edits)
 
 	count := 0
 	for i := range pRow {
-		pChar := string(pRow[i])
-		xChar := string(xRow[i])
-		if pChar == "-" || xChar == "-" {
-			count += 1
-			continue
-		}
 
-		if pChar != xChar {
+		if pRow[i] != xRow[i] {
 			count += 1
 		}
 	}
