@@ -4,6 +4,11 @@
 
 package gsa
 
+import (
+	"strconv"
+	"strings"
+)
+
 // Expand the compressed CIGAR encoding into the full list of edits.
 //
 //  Args:
@@ -13,6 +18,18 @@ package gsa
 //      The edit operations the CIGAR string describes.
 func CigarToEdits(cigar string) (edits string) {
 	edits = ""
+	number := 0
+	for pos, char := range cigar {
+		char := string(char)
+
+		//check if string is a number
+		if num, err := strconv.Atoi(char); err == nil {
+			number = number*10 + num
+		} else {
+			edits += strings.Repeat(string(cigar[pos]), number)
+			number = 0
+		}
+	}
 	return edits
 }
 
@@ -24,6 +41,23 @@ func CigarToEdits(cigar string) (edits string) {
 //  Returns:
 //      The CIGAR encoding of edits.
 func EditsToCigar(edits string) (cigar string) {
+	if edits == "" {
+		return ""
+	}
 	cigar = ""
+	counter := 1
+	last := string(edits[0])
+
+	for _, char := range edits[1:] {
+		char := string(char)
+		if char == last {
+			counter += 1
+		} else {
+			cigar += strconv.Itoa(counter) + last
+			counter = 1
+		}
+		last = char
+	}
+	cigar += strconv.Itoa(counter) + last
 	return cigar
 }

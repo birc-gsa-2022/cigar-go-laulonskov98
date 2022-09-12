@@ -4,6 +4,10 @@
 
 package gsa
 
+import (
+	"strings"
+)
+
 // Align two sequences from a sequence of edits.
 //
 //  Args:
@@ -14,9 +18,35 @@ package gsa
 //  Returns:
 //      The two rows in the pairwise alignment
 func Align(p, q, edits string) (pRow, qRow string) {
-	pRow, qRow = "", ""
+	var pBuffer strings.Builder
+	var qBuffer strings.Builder
+
+	pItr, qItr := 0, 0
+	for _, char := range edits {
+
+		pEnd := pItr + 1
+		qEnd := qItr + 1
+		if char == 'M' {
+			pBuffer.WriteString(p[pItr:pEnd])
+			qBuffer.WriteString(q[qItr:qEnd])
+			pItr += 1
+			qItr += 1
+		}
+
+		if char == 'I' {
+			pBuffer.WriteString("-")
+			qBuffer.WriteString(q[qItr:qEnd])
+			qItr += 1
+		}
+
+		if char == 'D' {
+			pBuffer.WriteString(p[pItr:pEnd])
+			qBuffer.WriteString("-")
+			pItr += 1
+		}
+	}
 	// Align p and q based on edits
-	return pRow, qRow
+	return pBuffer.String(), qBuffer.String()
 }
 
 // Align two sequences from a sequence of edits.
@@ -29,8 +59,10 @@ func Align(p, q, edits string) (pRow, qRow string) {
 //
 //  Returns:
 //      The two rows in the pairwise alignment
+
 func LocalAlign(p, x string, i int, edits string) (pRow, xRow string) {
 	pRow, xRow = "", ""
 	// Align p and q based on edits
+	pRow, xRow = Align(p, x[i:], edits)
 	return pRow, xRow
 }
