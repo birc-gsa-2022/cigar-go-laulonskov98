@@ -18,12 +18,16 @@ import (
 //      The edit operations the CIGAR string describes.
 func CigarToEdits(cigar string) (edits string) {
 	edits = ""
+	number := 0
 	for pos, char := range cigar {
 		char := string(char)
 
 		//check if string is a number
 		if num, err := strconv.Atoi(char); err == nil {
-			edits += strings.Repeat(string(cigar[pos+1]), num)
+			number = number*10 + num
+		} else {
+			edits += strings.Repeat(string(cigar[pos]), number)
+			number = 0
 		}
 	}
 	return edits

@@ -4,6 +4,8 @@
 
 package gsa
 
+import "strings"
+
 // Extract the edit operations from a pairwise alignment.
 //
 //  Args:
@@ -13,39 +15,41 @@ package gsa
 //  Returns:
 //      The two strings without gaps and the list of edit operations
 //      as a string.
-func GetEdits(p, q string) (gapFreeP, gapFreeQ, edits string) {
-	gapFreeP, gapFreeQ, edits = "", "", ""
+func GetEdits(p, q string) (string, string, string) {
+	var gapFreePBuf strings.Builder
+	var gapFreeQBuf strings.Builder
+	var editsBuf strings.Builder
 
 	// step 1
 	if p == "" && q == "" {
-		return gapFreeP, gapFreeQ, edits
+		return gapFreePBuf.String(), gapFreeQBuf.String(), editsBuf.String()
 	}
 
 	// step 2
-	if p[0:1] != "-" && q[0:1] != "-" {
-		gapFreeP += p[0:1]
-		gapFreeQ += q[0:1]
-		edits += "M"
+	if p[0] != '-' && q[0] != '-' {
+		gapFreePBuf.WriteString(p[0:1])
+		gapFreeQBuf.WriteString(q[0:1])
+		editsBuf.WriteString("M")
 	}
 
 	//step 3 + 4
 	for index := 1; index < len(p); index++ {
-		if p[index:index+1] == "-" {
-			gapFreeQ += q[index : index+1]
-			edits += "I"
+		if p[index] == '-' {
+			gapFreeQBuf.WriteString(q[index : index+1])
+			editsBuf.WriteString("I")
 			continue
 		}
 		if q[index:index+1] == "-" {
-			gapFreeP += p[index : index+1]
-			edits += "D"
+			gapFreePBuf.WriteString(p[index : index+1])
+			editsBuf.WriteString("D")
 			continue
 		}
-		gapFreeQ += q[index : index+1]
-		gapFreeP += p[index : index+1]
-		edits += "M"
+		gapFreePBuf.WriteString(p[index : index+1])
+		gapFreeQBuf.WriteString(q[index : index+1])
+		editsBuf.WriteString("M")
 	}
 
-	return gapFreeP, gapFreeQ, edits
+	return gapFreePBuf.String(), gapFreeQBuf.String(), editsBuf.String()
 }
 
 //  Get the distance between p and the string that starts at x[i:]
